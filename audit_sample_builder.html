@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ummeed · Risk-Based Audit Sample Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1b3a6b;
+    --blue-dark:#122a4f;
+    --blue-light:#2e5694;
+    --orange:#f37021;
+    --orange-soft:#fdebdd;
+    --blue-soft:#e8eef7;
+    --ink:#1f2733;
+    --ink-light:#6b7480;
+    --line:#e3e8ef;
+    --bg:#f5f7fa;
+    --green:#2f9e6f;
+    --amber:#e0a020;
+    --red:#d6483b;
+    --white:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 20px 80px;}
+
+  header{
+    background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);
+    color:#fff;padding:34px 40px;border-radius:0 0 20px 20px;margin-bottom:24px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:16px;}
+  .logo{
+    width:52px;height:52px;border-radius:13px;background:var(--orange);
+    display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;
+    font-weight:800;font-size:26px;color:#fff;flex:none;
+  }
+  .brand h1{font-family:'Poppins',sans-serif;font-weight:700;font-size:22px;margin:0;line-height:1.15;}
+  .brand .tag{font-size:13px;color:#b9c8e0;margin-top:2px;}
+  .headstat{text-align:right;}
+  .headstat .big{font-family:'Poppins',sans-serif;font-weight:800;font-size:30px;color:var(--orange);line-height:1;}
+  .headstat .lab{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#b9c8e0;margin-top:4px;}
+
+  .layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;}
+  @media (max-width:1000px){.layout{grid-template-columns:1fr;}}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:18px;}
+  .card h3{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;margin:0 0 2px;display:flex;align-items:center;gap:7px;}
+  .card .csub{font-size:12px;color:var(--ink-light);margin:0 0 14px;}
+
+  .info{
+    width:16px;height:16px;border-radius:50%;background:var(--blue-soft);color:var(--blue);
+    font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+    cursor:pointer;flex:none;position:relative;font-family:'Inter',sans-serif;
+  }
+  .info:hover{background:var(--blue);color:#fff;}
+  .info .pop{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;font-size:11.5px;font-weight:400;line-height:1.5;
+    padding:9px 11px;border-radius:7px;width:210px;opacity:0;pointer-events:none;
+    transition:opacity 0.18s ease;z-index:30;text-align:left;letter-spacing:0;text-transform:none;
+  }
+  .info:hover .pop{opacity:1;}
+  .info .pop::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--ink);}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);}
+  .toggle-row:last-child{border-bottom:none;}
+  .toggle-row .name{font-size:13px;display:flex;align-items:center;gap:6px;}
+  .toggle-row .grp{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-light);}
+  .switch{position:relative;width:38px;height:21px;flex:none;cursor:pointer;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:#cfd6e0;border-radius:21px;transition:0.2s;}
+  .slider::before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:0.2s;}
+  .switch input:checked + .slider{background:var(--orange);}
+  .switch input:checked + .slider::before{transform:translateX(17px);}
+
+  .grouplabel{font-family:'Poppins',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--blue-light);margin:14px 0 4px;}
+
+  .capbox .caprow{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+  .capbox input[type=range]{flex:1;accent-color:var(--orange);}
+  .capval{font-family:'Poppins',sans-serif;font-size:28px;font-weight:800;color:var(--blue);min-width:46px;text-align:center;}
+
+  .chartcard{position:relative;}
+  .chartwrap{display:grid;grid-template-columns:22px 1fr;grid-template-rows:1fr 22px;gap:0;margin-top:10px;}
+  .chartholder{position:relative;height:430px;grid-column:2;grid-row:1;}
+  .qlabel{position:absolute;font-family:'Poppins',sans-serif;font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase;pointer-events:none;font-weight:600;z-index:2;}
+  .q-tr{top:10px;right:12px;color:var(--red);}
+  .q-tl{top:10px;left:12px;color:var(--amber);}
+  .q-br{bottom:12px;right:12px;color:var(--amber);}
+  .q-bl{bottom:12px;left:12px;color:var(--green);}
+  .axisx{grid-column:2;grid-row:2;text-align:center;align-self:center;font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+  .axisy{grid-column:1;grid-row:1;writing-mode:vertical-lr;transform:rotate(180deg);text-align:center;justify-self:center;align-self:center;font-size:11px;color:var(--ink-light);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+  .legendrow{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-light);align-items:center;}
+  .legendrow span{display:inline-flex;align-items:center;gap:5px;}
+  .sw{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+  @media (max-width:640px){.statgrid{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:relative;}
+  .stat .lab{font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+  .stat .num{font-family:'Poppins',sans-serif;font-size:26px;font-weight:800;color:var(--blue);line-height:1;}
+  .stat .num.orange{color:var(--orange);}
+
+  .detailcard .empty{font-size:13px;color:var(--ink-light);font-style:italic;padding:10px 0;}
+  .bname{font-family:'Poppins',sans-serif;font-size:20px;font-weight:700;color:var(--blue);}
+  .breg{font-size:12px;color:var(--ink-light);margin-bottom:8px;}
+  .flags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .flag{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+  .flag-stale{background:var(--orange-soft);color:#b9530e;}
+  .flag-outlier{background:#fde8e6;color:#b3392e;}
+  .flag-lowconf{background:#fff6e0;color:#9a7012;}
+  .flag-mat{background:var(--blue-soft);color:var(--blue);}
+
+  .bars{margin-bottom:14px;}
+  .barline{margin-bottom:9px;}
+  .barhead{display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px;}
+  .barhead .bl{color:var(--ink-light);display:flex;align-items:center;gap:5px;}
+  .barhead .bv{font-weight:600;}
+  .bartrack{height:7px;background:var(--line);border-radius:5px;overflow:hidden;}
+  .barfill{height:100%;border-radius:5px;transition:width 0.4s ease;}
+  .barfill.inh{background:var(--blue);}
+  .barfill.ctl{background:var(--orange);}
+
+  .rationale{background:var(--blue-soft);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12.5px;line-height:1.5;margin-bottom:14px;color:var(--blue-dark);}
+
+  .detailcard button{
+    width:100%;font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0.3px;
+    padding:11px;border-radius:9px;border:none;cursor:pointer;color:#fff;
+  }
+  .btn-add{background:var(--green);}
+  .btn-remove{background:var(--red);}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--line);
+    border-radius:20px;padding:7px 13px;font-size:12px;cursor:pointer;transition:0.15s;
+  }
+  .chip:hover{transform:translateY(-1px);border-color:var(--orange);background:#fff;}
+  .chip.add i{color:var(--green);}
+  .chip.drop i{color:var(--red);}
+  .chips .none{font-size:12.5px;color:var(--ink-light);font-style:italic;}
+
+  .summary{
+    background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);
+    color:#fff;border-radius:16px;padding:28px 32px;margin-top:24px;
+  }
+  .summary h2{font-family:'Poppins',sans-serif;font-weight:700;font-size:20px;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
+  .summary .ssub{font-size:13px;color:#b9c8e0;margin:0 0 20px;}
+  .sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+  @media (max-width:760px){.sgrid{grid-template-columns:1fr;}}
+  .sbox{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px 18px;}
+  .sbox .sn{font-family:'Poppins',sans-serif;font-size:30px;font-weight:800;color:var(--orange);line-height:1;}
+  .sbox .sl{font-size:11.5px;color:#cdd9ec;margin-top:6px;line-height:1.4;}
+  .sreco{font-size:13.5px;line-height:1.7;color:#e8eef7;}
+  .sreco strong{color:#fff;}
+  .verdict{
+    display:inline-block;margin-top:16px;background:var(--orange);color:#fff;
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;padding:9px 18px;border-radius:9px;
+  }
+
+  .note{margin-top:22px;font-size:12px;color:var(--ink-light);border-top:1px dashed var(--line);padding-top:14px;line-height:1.6;}
+  i.ti{font-style:normal;}
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.1.0/tabler-icons.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">U</div>
+      <div>
+        <h1>Risk-Based Audit Sample Builder</h1>
+        <div class="tag">Internal Audit · annual branch sampling, automated</div>
+      </div>
+    </div>
+    <div class="headstat">
+      <div class="big" id="hsScore">—</div>
+      <div class="lab">Risk coverage achieved</div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- LEFT CONTROL COLUMN -->
+    <div>
+      <div class="card capbox">
+        <h3>Audit capacity
+          <span class="info">i<span class="pop">How many branches your team can realistically audit this cycle. The tool always fills this with the highest-risk branches first.</span></span>
+        </h3>
+        <p class="csub">Branches you can cover this cycle</p>
+        <div class="caprow">
+          <input type="range" id="capSlider" min="1" max="15" value="6">
+          <div class="capval" id="capVal">6</div>
+        </div>
+        <div style="font-size:12px;color:var(--ink-light);display:flex;align-items:center;gap:6px;">
+          <i class="ti ti-clock-hour-4"></i> Est. <b id="daysEst" style="color:var(--blue);margin:0 3px;">—</b> auditor-days
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Risk parameters
+          <span class="info">i<span class="pop">The signals used to score each branch. Switch any off if you think it isn't relevant — every score and the whole map recalculates instantly.</span></span>
+        </h3>
+        <p class="csub">Toggle what feeds the risk score</p>
+
+        <div class="grouplabel">Inherent risk
+          <span class="info" style="vertical-align:middle;">i<span class="pop">How risky a branch is by its nature — size, growth and asset quality — regardless of how well it's run.</span></span>
+        </div>
+        <div class="toggle-row"><span class="name">Disbursement volume</span><label class="switch"><input type="checkbox" data-param="disb" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><span class="name">Loan book growth</span><label class="switch"><input type="checkbox" data-param="growth" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><span class="name">NPA %</span><label class="switch"><input type="checkbox" data-param="npa" checked><span class="slider"></span></label></div>
+
+        <div class="grouplabel">Control risk
+          <span class="info" style="vertical-align:middle;">i<span class="pop">How well a branch is actually controlled in practice — based on audit history, staffing and exceptions.</span></span>
+        </div>
+        <div class="toggle-row"><span class="name">Past audit findings</span><label class="switch"><input type="checkbox" data-param="findings" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><span class="name">Staff vacancy %</span><label class="switch"><input type="checkbox" data-param="vacancy" checked><span class="slider"></span></label></div>
+        <div class="toggle-row"><span class="name">Manual overrides / mo</span><label class="switch"><input type="checkbox" data-param="overrides" checked><span class="slider"></span></label></div>
+      </div>
+
+      <div class="card">
+        <h3>Safeguards
+          <span class="info">i<span class="pop">Audit-practice rules layered on top of the risk score so nothing important slips through.</span></span>
+        </h3>
+        <p class="csub">Rules layered on the risk score</p>
+        <div class="toggle-row">
+          <span class="name">Materiality floor
+            <span class="info">i<span class="pop">Always audit the largest branches by loan book, however good their control score — a big branch should never be skipped on score alone.</span></span>
+          </span>
+          <label class="switch"><input type="checkbox" id="matFloor" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="name">Blind random sample
+            <span class="info">i<span class="pop">Adds a couple of branches picked at random, to catch risks no parameter is measuring. This is how you get assurance over the whole population, not just where you expect risk.</span></span>
+          </span>
+          <label class="switch"><input type="checkbox" id="randSample" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="name">Force stale branches
+            <span class="info">i<span class="pop">Pulls in any branch not audited for 2+ cycles. RBI requires that even low-risk units don't stay excluded indefinitely.</span></span>
+          </span>
+          <label class="switch"><input type="checkbox" id="forceStale" checked><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT MAIN COLUMN -->
+    <div>
+      <div class="statgrid">
+        <div class="stat"><div class="lab">In sample <span class="info">i<span class="pop">Total branches selected for audit this cycle, after risk ranking and safeguards.</span></span></div><div class="num orange" id="statSel">—</div></div>
+        <div class="stat"><div class="lab">Book coverage <span class="info">i<span class="pop">Share of total loan book (₹) covered by the selected branches. Higher means more of the money is being looked at.</span></span></div><div class="num" id="statBook">—</div></div>
+        <div class="stat"><div class="lab">Risk coverage <span class="info">i<span class="pop">Share of total risk score covered by the selected branches. This is the real measure of how much actual risk your sample catches.</span></span></div><div class="num" id="statRisk">—</div></div>
+        <div class="stat"><div class="lab">Efficiency <span class="info">i<span class="pop">Risk coverage per branch audited. Higher means you're catching more risk for less audit effort — the whole point of risk-based sampling.</span></span></div><div class="num" id="statEff">—</div></div>
+      </div>
+
+      <div class="card chartcard">
+        <h3>Branch risk map
+          <span class="info">i<span class="pop">Every branch plotted by inherent risk (→) and control risk (↑). Bubble size = loan book. Top-right = most urgent. Click any bubble to add or remove it.</span></span>
+        </h3>
+        <p class="csub">Click any branch to override the selection by hand</p>
+        <div class="chartwrap">
+          <span class="axisy">Control risk →</span>
+          <div class="chartholder">
+            <span class="qlabel q-tr">▲ audit now</span>
+            <span class="qlabel q-tl">tighten controls</span>
+            <span class="qlabel q-br">watch growth</span>
+            <span class="qlabel q-bl">low priority</span>
+            <canvas id="riskChart" role="img" aria-label="Bubble chart of branches by inherent and control risk, sized by loan book"></canvas>
+          </div>
+          <span class="axisx">Inherent risk →</span>
+        </div>
+        <div class="legendrow">
+          <span><span class="sw" style="background:#f37021"></span>In sample</span>
+          <span><span class="sw" style="background:#1b3a6b"></span>Materiality floor</span>
+          <span><span class="sw" style="background:#2f9e6f"></span>Random pick</span>
+          <span><span class="sw" style="background:#cfd6e0"></span>Not selected</span>
+          <span>Bubble = loan book size</span>
+        </div>
+      </div>
+
+      <div class="card detailcard" id="detailCard">
+        <h3>Branch detail
+          <span class="info">i<span class="pop">The full parameter breakdown for one branch, the auto-written reason it's in or out, and a manual override button.</span></span>
+        </h3>
+        <div class="empty">Click any bubble on the map to see exactly what's driving its score.</div>
+      </div>
+
+      <div class="card">
+        <h3>Worth a second look
+          <span class="info">i<span class="pop">One-click nudges: high-risk branches currently left out, or low-risk ones currently taking up a slot.</span></span>
+        </h3>
+        <p class="csub">Quick adjustments the data suggests</p>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <h2><i class="ti ti-clipboard-check"></i> Sample recommendation</h2>
+    <p class="ssub">Auto-generated summary for the Audit Committee</p>
+    <div class="sgrid">
+      <div class="sbox"><div class="sn" id="sumSel">—</div><div class="sl">branches selected for audit this cycle, out of 15</div></div>
+      <div class="sbox"><div class="sn" id="sumRisk">—</div><div class="sl">of total branch risk covered by this sample</div></div>
+      <div class="sbox"><div class="sn" id="sumEff">—</div><div class="sl">efficiency — risk covered per branch audited</div></div>
+    </div>
+    <div class="sreco" id="sumText"></div>
+    <div class="verdict" id="sumVerdict"></div>
+  </div>
+
+  <div class="note">
+    Demonstration on 15 sample branches with illustrative figures — not Ummeed's live data. Scoring scales each parameter against the current branch set (min–max normalisation), tiers and weightings are sensible starting points to be calibrated with real data, and the random-sample slot should rotate each cycle in production so the same branches aren't repeatedly chosen.
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const branches = [
+  {id:'BR-01',region:'North',disb:480,npa:6.8,growth:32,findings:5,vacancy:22,overrides:18,lastAudit:1,conf:true},
+  {id:'BR-02',region:'North',disb:120,npa:2.1,growth:8,findings:1,vacancy:5,overrides:3,lastAudit:1,conf:true},
+  {id:'BR-03',region:'East',disb:340,npa:4.5,growth:15,findings:3,vacancy:12,overrides:9,lastAudit:2,conf:true},
+  {id:'BR-04',region:'East',disb:90,npa:1.8,growth:5,findings:0,vacancy:0,overrides:1,lastAudit:3,conf:false},
+  {id:'BR-05',region:'West',disb:560,npa:7.9,growth:38,findings:6,vacancy:28,overrides:21,lastAudit:1,conf:true},
+  {id:'BR-06',region:'West',disb:210,npa:3.2,growth:12,findings:2,vacancy:8,overrides:6,lastAudit:1,conf:true},
+  {id:'BR-07',region:'Central',disb:150,npa:2.6,growth:9,findings:1,vacancy:6,overrides:4,lastAudit:2,conf:true},
+  {id:'BR-08',region:'Central',disb:400,npa:5.9,growth:25,findings:4,vacancy:18,overrides:14,lastAudit:1,conf:true},
+  {id:'BR-09',region:'North',disb:70,npa:1.2,growth:3,findings:0,vacancy:2,overrides:0,lastAudit:3,conf:false},
+  {id:'BR-10',region:'East',disb:300,npa:4.0,growth:14,findings:2,vacancy:10,overrides:7,lastAudit:2,conf:true},
+  {id:'BR-11',region:'West',disb:180,npa:2.9,growth:10,findings:1,vacancy:7,overrides:5,lastAudit:1,conf:true},
+  {id:'BR-12',region:'Central',disb:520,npa:8.4,growth:35,findings:5,vacancy:25,overrides:72,lastAudit:1,conf:true},
+  {id:'BR-13',region:'North',disb:250,npa:3.6,growth:13,findings:2,vacancy:9,overrides:8,lastAudit:2,conf:true},
+  {id:'BR-14',region:'East',disb:60,npa:1.0,growth:2,findings:0,vacancy:3,overrides:1,lastAudit:3,conf:false},
+  {id:'BR-15',region:'West',disb:600,npa:9.2,growth:40,findings:6,vacancy:30,overrides:23,lastAudit:1,conf:true}
+];
+
+const PARAMS = {
+  inherent:['disb','growth','npa'],
+  control:['findings','vacancy','overrides']
+};
+const PARAM_LABEL = {disb:'Disbursement',growth:'Growth',npa:'NPA',findings:'Findings',vacancy:'Vacancy',overrides:'Overrides'};
+
+function activeParams(){
+  const on = {};
+  document.querySelectorAll('input[data-param]').forEach(cb=>{ on[cb.dataset.param]=cb.checked; });
+  return on;
+}
+
+function normKey(key){
+  const vals = branches.map(b=>b[key]);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const out = {};
+  branches.forEach(b=>{ out[b.id] = max===min ? 0 : ((b[key]-min)/(max-min))*100; });
+  return out;
+}
+
+function outlierSet(key){
+  const vals = branches.map(b=>b[key]);
+  const mean = vals.reduce((a,c)=>a+c,0)/vals.length;
+  const sd = Math.sqrt(vals.reduce((a,c)=>a+(c-mean)**2,0)/vals.length);
+  const set = new Set();
+  branches.forEach(b=>{ if(sd>0 && (b[key]-mean)/sd > 2.2) set.add(b.id); });
+  return set;
+}
+
+let normed = {};
+let outliers = {};
+let selectedId = null;
+
+function recompute(){
+  const on = activeParams();
+  [...PARAMS.inherent, ...PARAMS.control].forEach(k=>{ normed[k]=normKey(k); outliers[k]=outlierSet(k); });
+
+  branches.forEach(b=>{
+    const inhKeys = PARAMS.inherent.filter(k=>on[k]);
+    const ctlKeys = PARAMS.control.filter(k=>on[k]);
+    b.inherent = inhKeys.length ? inhKeys.reduce((s,k)=>s+normed[k][b.id],0)/inhKeys.length : 0;
+    b.control = ctlKeys.length ? ctlKeys.reduce((s,k)=>s+normed[k][b.id],0)/ctlKeys.length : 0;
+    b.overall = (b.inherent + b.control)/2;
+    b.isOutlier = [...PARAMS.inherent,...PARAMS.control].some(k=>on[k] && outliers[k].has(b.id));
+    b.daysCost = Math.round(2 + (b.disb/maxDisb)*4 + (b.overall/100)*2);
+  });
+
+  applySelection();
+  updateStats();
+  updateChips();
+  updateSummary();
+  if(selectedId){ const b = branches.find(x=>x.id===selectedId); if(b) showDetail(b); }
+  try { drawChart(); } catch(e) { console.warn('Chart unavailable:', e); }
+}
+
+const maxDisb = Math.max(...branches.map(b=>b.disb));
+const minDisb = Math.min(...branches.map(b=>b.disb));
+function radiusFor(d){ return 9 + ((d-minDisb)/(maxDisb-minDisb))*20; }
+
+function applySelection(){
+  const cap = parseInt(document.getElementById('capSlider').value);
+  const matOn = document.getElementById('matFloor').checked;
+  const randOn = document.getElementById('randSample').checked;
+  const staleOn = document.getElementById('forceStale').checked;
+
+  branches.forEach(b=>{ b.selected=false; b.selReason=''; b.isMat=false; b.isRand=false; b.isStale=false; });
+
+  const ranked = [...branches].sort((a,b)=>b.overall-a.overall);
+  ranked.slice(0,cap).forEach(b=>{ b.selected=true; b.selReason='risk'; });
+
+  if(matOn){
+    [...branches].sort((a,b)=>b.disb-a.disb).slice(0,3).forEach(b=>{
+      if(!b.selected){ b.selected=true; b.selReason='materiality'; }
+      b.isMat=true;
+    });
+  }
+  if(staleOn){
+    branches.filter(b=>b.lastAudit>=3).forEach(b=>{
+      if(!b.selected){ b.selected=true; b.selReason='stale'; }
+      b.isStale=true;
+    });
+  }
+  if(randOn){
+    const notSel = branches.filter(b=>!b.selected);
+    const picks = [];
+    const seed = [...notSel].sort((a,b)=>a.id.localeCompare(b.id));
+    if(seed.length>0) picks.push(seed[Math.floor(seed.length*0.4)]);
+    if(seed.length>2) picks.push(seed[Math.floor(seed.length*0.75)]);
+    picks.forEach(b=>{ if(b){ b.selected=true; b.selReason='random'; b.isRand=true; } });
+  }
+}
+
+function renderBranchGrid(){
+  const grid = document.getElementById('branchGrid');
+  if(!grid) return;
+  const sorted = [...branches].sort((a,b)=>b.overall-a.overall);
+  grid.innerHTML = '<div style="font-size:11.5px;color:#6b7480;margin:2px 4px 10px;">Sorted by risk · click to add or remove from sample</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;">'+
+    sorted.map(b=>{
+      let col = b.selected ? (b.selReason==='random'?'#2f9e6f':b.selReason==='materiality'?'#1b3a6b':'#f37021') : '#cfd6e0';
+      let bg = b.selected ? (b.selReason==='random'?'#eaf6f0':b.selReason==='materiality'?'#e8eef7':'#fdebdd') : '#f5f7fa';
+      let txt = b.selected ? (b.selReason==='random'?'#1d6b49':b.selReason==='materiality'?'#1b3a6b':'#b9530e') : '#6b7480';
+      return `<div data-bid="${b.id}" style="cursor:pointer;border:1.5px solid ${col};background:${bg};border-radius:9px;padding:8px 10px;transition:0.15s;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;color:${txt};">${b.id}</span>
+          <span style="font-size:10px;font-weight:600;color:${txt};">${b.selected?'✓':'+'}</span>
+        </div>
+        <div style="font-size:10.5px;color:#6b7480;margin-top:2px;">risk ${Math.round(b.overall)} · ₹${b.disb}Cr</div>
+      </div>`;
+    }).join('')+'</div>';
+  grid.querySelectorAll('[data-bid]').forEach(el=>{
+    el.onclick=()=>{
+      const b=branches.find(x=>x.id===el.dataset.bid);
+      b.selected=!b.selected;b.selReason=b.selected?'manual':'';
+      selectedId=b.id;
+      renderBranchGrid();updateStats();updateChips();updateSummary();showDetail(b);
+    };
+  });
+}
+
+let chart;
+function drawChart(){
+  if(typeof Chart === 'undefined'){
+    const holder = document.querySelector('.chartholder');
+    if(holder && !holder.dataset.fallback){
+      holder.dataset.fallback='1';
+      holder.innerHTML='<div id="branchGrid" style="position:absolute;inset:0;overflow:auto;padding:4px;"></div>';
+    }
+    renderBranchGrid();
+    return;
+  }
+  const data = branches.map(b=>({x:b.inherent,y:b.control,r:radiusFor(b.disb)}));
+  const bg = branches.map(b=>{
+    if(!b.selected) return 'rgba(207,214,224,0.55)';
+    if(b.selReason==='random') return 'rgba(47,158,111,0.8)';
+    if(b.selReason==='materiality') return 'rgba(27,58,107,0.8)';
+    return 'rgba(243,112,33,0.82)';
+  });
+  const bd = branches.map(b=>{
+    if(!b.selected) return '#b4bcc8';
+    if(b.selReason==='random') return '#2f9e6f';
+    if(b.selReason==='materiality') return '#1b3a6b';
+    return '#f37021';
+  });
+
+  if(chart){
+    chart.data.datasets[0].data = data;
+    chart.data.datasets[0].backgroundColor = bg;
+    chart.data.datasets[0].borderColor = bd;
+    chart.update();
+    return;
+  }
+
+  chart = new Chart(document.getElementById('riskChart'),{
+    type:'bubble',
+    data:{datasets:[{data, backgroundColor:bg, borderColor:bd, borderWidth:2}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      layout:{padding:{top:18,right:10,bottom:6,left:6}},
+      scales:{
+        x:{min:0,max:100,grid:{color:'#eef1f6'},ticks:{color:'#6b7480',font:{size:11}}},
+        y:{min:0,max:100,grid:{color:'#eef1f6'},ticks:{color:'#6b7480',font:{size:11}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:(it)=>{const b=branches[it.dataIndex];return `${b.id} · ₹${b.disb}Cr`;}}}
+      },
+      onClick:(e,els)=>{
+        if(!els.length) return;
+        const b = branches[els[0].index];
+        b.selected=!b.selected;
+        b.selReason = b.selected ? 'manual' : '';
+        selectedId=b.id;
+        drawChart();updateStats();updateChips();updateSummary();showDetail(b);
+      }
+    },
+    plugins:[{
+      id:'quad',
+      beforeDraw(c){
+        const {ctx,chartArea:a,scales}=c;
+        const mx=scales.x.getPixelForValue(50), my=scales.y.getPixelForValue(50);
+        ctx.save();
+        ctx.fillStyle='rgba(47,158,111,0.05)';ctx.fillRect(a.left,my,mx-a.left,a.bottom-my);
+        ctx.fillStyle='rgba(224,160,32,0.06)';ctx.fillRect(mx,my,a.right-mx,a.bottom-my);
+        ctx.fillStyle='rgba(224,160,32,0.06)';ctx.fillRect(a.left,a.top,mx-a.left,my-a.top);
+        ctx.fillStyle='rgba(214,72,59,0.07)';ctx.fillRect(mx,a.top,a.right-mx,my-a.top);
+        ctx.strokeStyle='rgba(27,58,107,0.18)';ctx.setLineDash([4,4]);
+        ctx.beginPath();ctx.moveTo(mx,a.top);ctx.lineTo(mx,a.bottom);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(a.left,my);ctx.lineTo(a.right,my);ctx.stroke();
+        ctx.restore();
+      }
+    }]
+  });
+}
+
+function animateNum(el,to,suffix){
+  const from=parseFloat(el.textContent)||0;
+  const start=performance.now();
+  function step(now){
+    const p=Math.min(1,(now-start)/350);
+    const v=from+(to-from)*p;
+    el.textContent=(Number.isInteger(to)?Math.round(v):v.toFixed(1))+(suffix||'');
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function updateStats(){
+  const sel=branches.filter(b=>b.selected);
+  const totD=branches.reduce((s,b)=>s+b.disb,0);
+  const totR=branches.reduce((s,b)=>s+b.overall,0);
+  const selD=sel.reduce((s,b)=>s+b.disb,0);
+  const selR=sel.reduce((s,b)=>s+b.overall,0);
+  const days=sel.reduce((s,b)=>s+b.daysCost,0);
+  const bookPct=totD?Math.round(selD/totD*100):0;
+  const riskPct=totR?Math.round(selR/totR*100):0;
+  const eff=sel.length?+(riskPct/sel.length).toFixed(1):0;
+
+  animateNum(document.getElementById('statSel'),sel.length);
+  animateNum(document.getElementById('statBook'),bookPct,'%');
+  animateNum(document.getElementById('statRisk'),riskPct,'%');
+  document.getElementById('statEff').textContent=eff+'×';
+  document.getElementById('hsScore').textContent=riskPct+'%';
+  document.getElementById('daysEst').textContent=days;
+}
+
+function updateChips(){
+  const sortedAll=[...branches].sort((a,b)=>b.overall-a.overall);
+  const p75=sortedAll[Math.floor(sortedAll.length*0.25)].overall;
+  const p25=sortedAll[Math.floor(sortedAll.length*0.75)].overall;
+  const add=branches.filter(b=>!b.selected&&b.overall>=p75).sort((a,b)=>b.overall-a.overall).slice(0,3);
+  const drop=branches.filter(b=>b.selected&&b.overall<=p25&&b.selReason!=='materiality'&&b.selReason!=='stale').sort((a,b)=>a.overall-b.overall).slice(0,3);
+
+  const el=document.getElementById('chips');el.innerHTML='';
+  if(!add.length&&!drop.length){el.innerHTML='<span class="none">Sample looks well balanced.</span>';return;}
+  add.forEach(b=>{
+    const c=document.createElement('span');c.className='chip add';
+    c.innerHTML=`<i class="ti ti-plus"></i> add <b>${b.id}</b> · score ${Math.round(b.overall)}`;
+    c.onclick=()=>{b.selected=true;b.selReason='manual';selectedId=b.id;drawChart();updateStats();updateChips();updateSummary();showDetail(b);};
+    el.appendChild(c);
+  });
+  drop.forEach(b=>{
+    const c=document.createElement('span');c.className='chip drop';
+    c.innerHTML=`<i class="ti ti-minus"></i> drop <b>${b.id}</b> · score ${Math.round(b.overall)}`;
+    c.onclick=()=>{b.selected=false;b.selReason='';selectedId=b.id;drawChart();updateStats();updateChips();updateSummary();showDetail(b);};
+    el.appendChild(c);
+  });
+}
+
+function showDetail(b){
+  const on=activeParams();
+  const inhBars=PARAMS.inherent.map(k=>{
+    const active=on[k];
+    return `<div class="barline">
+      <div class="barhead"><span class="bl">${PARAM_LABEL[k]}${active?'':' <span style="color:#b4bcc8">(off)</span>'}</span><span class="bv">${active?Math.round(normed[k][b.id]):'—'}</span></div>
+      <div class="bartrack"><div class="barfill inh" style="width:${active?normed[k][b.id]:0}%;opacity:${active?1:0.3}"></div></div>
+    </div>`;
+  }).join('');
+  const ctlBars=PARAMS.control.map(k=>{
+    const active=on[k];
+    return `<div class="barline">
+      <div class="barhead"><span class="bl">${PARAM_LABEL[k]}${active?'':' <span style="color:#b4bcc8">(off)</span>'}</span><span class="bv">${active?Math.round(normed[k][b.id]):'—'}</span></div>
+      <div class="bartrack"><div class="barfill ctl" style="width:${active?normed[k][b.id]:0}%;opacity:${active?1:0.3}"></div></div>
+    </div>`;
+  }).join('');
+
+  let flags='';
+  if(b.isMat) flags+='<span class="flag flag-mat"><i class="ti ti-building-bank"></i> material size</span>';
+  if(b.isStale) flags+='<span class="flag flag-stale"><i class="ti ti-clock-exclamation"></i> not audited 2+ cycles</span>';
+  if(b.isOutlier) flags+='<span class="flag flag-outlier"><i class="ti ti-alert-triangle"></i> outlier — verify data</span>';
+  if(!b.conf) flags+='<span class="flag flag-lowconf"><i class="ti ti-help-circle"></i> low data confidence</span>';
+
+  let reason='';
+  const topInh=PARAMS.inherent.filter(k=>on[k]).sort((x,y)=>normed[y][b.id]-normed[x][b.id])[0];
+  const topCtl=PARAMS.control.filter(k=>on[k]).sort((x,y)=>normed[y][b.id]-normed[x][b.id])[0];
+  if(b.selected){
+    if(b.selReason==='materiality') reason=`Included by the materiality floor — at ₹${b.disb}Cr it's among the largest branches and is audited regardless of score.`;
+    else if(b.selReason==='stale') reason=`Included because it hasn't been audited in ${b.lastAudit} cycles — pulled in so it doesn't stay excluded.`;
+    else if(b.selReason==='random') reason=`Included as a blind random pick — provides assurance over branches the risk model wouldn't otherwise flag.`;
+    else if(b.selReason==='manual') reason=`Manually added by the auditor.`;
+    else reason=`Included on risk — overall score ${Math.round(b.overall)}${topInh?`, driven by high ${PARAM_LABEL[topInh].toLowerCase()}`:''}${topCtl?` and ${PARAM_LABEL[topCtl].toLowerCase()}`:''}.`;
+  } else {
+    reason=`Excluded — overall score ${Math.round(b.overall)} sits below this cycle's cut-off${b.lastAudit<=1?', and it was audited recently':''}.`;
+  }
+
+  document.getElementById('detailCard').innerHTML=`
+    <h3>Branch detail <span class="info">i<span class="pop">Full parameter breakdown, the auto-written reason, and a manual override.</span></span></h3>
+    <div class="bname">${b.id}</div>
+    <div class="breg">${b.region} region · ₹${b.disb}Cr loan book · overall risk ${Math.round(b.overall)}</div>
+    ${flags?`<div class="flags">${flags}</div>`:''}
+    <div class="bars">
+      <div class="grouplabel" style="margin-top:0;color:var(--blue)">Inherent risk · ${Math.round(b.inherent)}</div>
+      ${inhBars}
+      <div class="grouplabel" style="color:var(--orange)">Control risk · ${Math.round(b.control)}</div>
+      ${ctlBars}
+    </div>
+    <div class="rationale"><i class="ti ti-info-circle"></i> ${reason}</div>
+    <button class="${b.selected?'btn-remove':'btn-add'}" id="toggleBtn">
+      ${b.selected?'<i class="ti ti-x"></i> Remove from sample':'<i class="ti ti-plus"></i> Add to sample'}
+    </button>`;
+  document.getElementById('toggleBtn').onclick=()=>{
+    b.selected=!b.selected;b.selReason=b.selected?'manual':'';
+    drawChart();updateStats();updateChips();updateSummary();showDetail(b);
+  };
+}
+
+function updateSummary(){
+  const sel=branches.filter(b=>b.selected);
+  const totR=branches.reduce((s,b)=>s+b.overall,0);
+  const selR=sel.reduce((s,b)=>s+b.overall,0);
+  const totD=branches.reduce((s,b)=>s+b.disb,0);
+  const selD=sel.reduce((s,b)=>s+b.disb,0);
+  const riskPct=totR?Math.round(selR/totR*100):0;
+  const bookPct=totD?Math.round(selD/totD*100):0;
+  const eff=sel.length?+(riskPct/sel.length).toFixed(1):0;
+  const days=sel.reduce((s,b)=>s+b.daysCost,0);
+  const matN=sel.filter(b=>b.isMat).length;
+  const randN=sel.filter(b=>b.selReason==='random').length;
+  const staleN=sel.filter(b=>b.selReason==='stale').length;
+
+  animateNum(document.getElementById('sumSel'),sel.length);
+  animateNum(document.getElementById('sumRisk'),riskPct,'%');
+  document.getElementById('sumEff').textContent=eff+'×';
+
+  document.getElementById('sumText').innerHTML=
+    `This plan audits <strong>${sel.length} of 15 branches</strong> (≈${days} auditor-days) while covering <strong>${riskPct}% of total branch risk</strong> and <strong>${bookPct}% of the loan book</strong>. `+
+    `Selection is risk-led, then reinforced by safeguards: `+
+    `<strong>${matN}</strong> large branch${matN===1?'':'es'} pulled in by the materiality floor, `+
+    `<strong>${staleN}</strong> brought in for not being audited recently, and `+
+    `<strong>${randN}</strong> blind random pick${randN===1?'':'s'} for assurance beyond the model. `+
+    `At <strong>${eff}× efficiency</strong>, each audited branch covers an outsized share of risk — the core benefit of risk-based over uniform sampling.`;
+
+  let verdict='';
+  if(riskPct>=70) verdict=`<i class="ti ti-circle-check"></i> Strong coverage — recommended for approval`;
+  else if(riskPct>=50) verdict=`<i class="ti ti-alert-circle"></i> Moderate coverage — consider adding 1–2 high-risk branches`;
+  else verdict=`<i class="ti ti-alert-triangle"></i> Low coverage — increase audit capacity before sign-off`;
+  document.getElementById('sumVerdict').innerHTML=verdict;
+}
+
+document.getElementById('capSlider').addEventListener('input',e=>{
+  document.getElementById('capVal').textContent=e.target.value;
+  recompute();
+});
+document.querySelectorAll('input[data-param], #matFloor, #randSample, #forceStale').forEach(cb=>{
+  cb.addEventListener('change',recompute);
+});
+
+recompute();
+</script>
+
+</body>
+</html>
