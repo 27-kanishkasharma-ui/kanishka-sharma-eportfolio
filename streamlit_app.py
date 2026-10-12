@@ -36,9 +36,25 @@ def img_b64(path: Path) -> str:
     return base64.b64encode(read_bytes(str(path))).decode()
 
 
+GITHUB_REPO = "https://github.com/27-kanishkasharma-ui/kanishka-sharma-eportfolio"
+
+
+def locate(path: Path):
+    """Find a file in its folder, or at the top level of the repo if folders were flattened on upload."""
+    if path.exists():
+        return path
+    flat = ROOT / path.name
+    return flat if flat.exists() else None
+
+
+def github_view_url(path: Path) -> str:
+    return f"{GITHUB_REPO}/blob/main/{path.relative_to(ROOT).as_posix()}"
+
+
 def download(label: str, path: Path, key: str, primary: bool = False):
     """Download button that quietly skips a file that is missing from the repo."""
-    if not path.exists():
+    path = locate(path)
+    if path is None:
         return
     st.download_button(
         label,
@@ -159,8 +175,8 @@ def section(anchor: str, kicker: str, title: str, sub: str = ""):
 
 
 # ---------------------------------------------------------------- hero
-photo = ASSETS / "profile.jpg"
-photo_html = f'<img src="data:image/jpeg;base64,{img_b64(photo)}" alt="Kanishka Sharma">' if photo.exists() else ""
+photo = locate(ASSETS / "profile.jpg")
+photo_html = f'<img src="data:image/jpeg;base64,{img_b64(photo)}" alt="Kanishka Sharma">' if photo else ""
 st.markdown(
     f"""
 <div class="hero">
@@ -237,13 +253,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-audit_html = ASSETS / "audit_sample_builder.html"
-if audit_html.exists():
+audit_html = locate(ASSETS / "audit_sample_builder.html")
+if audit_html:
     with st.expander("Try the live tool: move the capacity slider, switch risk factors off, click any branch", expanded=False):
         st.iframe(audit_html, height=1650)
 
 # ---------------------------------------------------------------- projects
 section("projects", "Evidence", "Projects", "Each project includes the files I actually produced.")
+st.link_button("Browse all project files on GitHub ↗", GITHUB_REPO)
 
 PROJECTS = [
     {
@@ -335,7 +352,15 @@ def project_card(p: dict, idx: int):
             unsafe_allow_html=True,
         )
         for j, (label, rel) in enumerate(p["files"]):
-            download(f"⬇ {label}", PROJ / rel, f"p{idx}_{j}")
+            found = locate(PROJ / rel)
+            if not found:
+                continue
+            d, v = st.columns([3, 1.3], gap="small")
+            with d:
+                download(f"⬇ {label}", found, f"p{idx}_{j}")
+            with v:
+                st.link_button("View ↗", github_view_url(found), width="stretch",
+                               help="Open this file on GitHub in a new tab")
 
 
 for i in range(0, len(PROJECTS), 2):
